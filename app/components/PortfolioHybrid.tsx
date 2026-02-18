@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 
 export default function PortfolioHybrid() {
   const [hovered, setHovered] = useState<"creative" | "tech" | null>(null);
+  const [isStatic, setIsStatic] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -22,6 +23,9 @@ export default function PortfolioHybrid() {
     }, 800);
   };
 
+  const showCreativeContent = isStatic || hovered === "creative";
+  const showTechContent = isStatic || hovered === "tech";
+
   return (
     <div className="relative h-screen w-full overflow-hidden bg-[#0d1117] font-sans">
       
@@ -36,15 +40,16 @@ export default function PortfolioHybrid() {
             <div className="text-center px-4">
               <motion.h1 
                 animate={{ 
-                  color: hovered === "tech" ? "#10b981" : "#0f172a",
+                  color: isStatic ? "#475569" : (hovered === "tech" ? "#10b981" : "#0f172a"),
+                  scale: isMobile && isStatic ? 0.8 : 1
                 }}
-                className="text-6xl md:text-[9rem] font-black tracking-tighter leading-[0.8] uppercase transition-colors duration-500"
+                className="text-5xl md:text-[9rem] font-black tracking-tighter leading-[0.8] uppercase transition-all duration-500"
               >
                 JULIAN<br />MALDONADO
               </motion.h1>
-              <div className="flex justify-between mt-2 px-1">
-                <span className={`text-[10px] font-mono font-bold tracking-widest transition-colors duration-500 ${hovered === "tech" ? "text-emerald-500" : "text-slate-500"}`}>EST. 2004</span>
-                <span className={`text-[10px] font-mono font-bold tracking-widest transition-colors duration-500 ${hovered === "tech" ? "text-emerald-500" : "text-slate-500"}`}>UBA / UTN</span>
+              <div className={`flex justify-between mt-2 px-1 transition-opacity ${isMobile && isStatic ? 'opacity-0' : 'opacity-100'}`}>
+                <span className={`text-[10px] font-mono font-bold tracking-widest transition-colors duration-500 ${(isStatic || hovered === "tech") ? "text-emerald-500" : "text-slate-500"}`}>EST. 2004</span>
+                <span className={`text-[10px] font-mono font-bold tracking-widest transition-colors duration-500 ${(isStatic || hovered === "tech") ? "text-emerald-500" : "text-slate-500"}`}>UBA / UTN</span>
               </div>
             </div>
           </motion.div>
@@ -55,32 +60,25 @@ export default function PortfolioHybrid() {
         
         {/* --- LADO ANALOGICO --- */}
         <motion.div
-          onMouseEnter={() => !isExiting && setHovered("creative")}
-          onMouseLeave={() => !isExiting && setHovered(null)}
+          onMouseEnter={() => !isExiting && !isStatic && setHovered("creative")}
+          onMouseLeave={() => !isExiting && !isStatic && setHovered(null)}
           animate={{ 
-            // Logica de expansión al 100% al salir
             width: !isMobile 
-              ? (isExiting && hovered === "creative" ? "100%" : isExiting && hovered === "tech" ? "0%" : (hovered === "creative" ? "65%" : hovered === "tech" ? "35%" : "50%"))
+              ? (isExiting && hovered === "creative" ? "100%" : isExiting && hovered === "tech" ? "0%" : (isStatic ? "50%" : (hovered === "creative" ? "65%" : hovered === "tech" ? "35%" : "50%")))
               : "100%",
             height: isMobile 
-              ? (isExiting && hovered === "creative" ? "100%" : isExiting && hovered === "tech" ? "0%" : (hovered === "creative" ? "75%" : hovered === "tech" ? "25%" : "50%"))
+              ? (isExiting && hovered === "creative" ? "100%" : isExiting && hovered === "tech" ? "0%" : (isStatic ? "50%" : (hovered === "creative" ? "75%" : hovered === "tech" ? "25%" : "50%")))
               : "100%",
             zIndex: hovered === "creative" ? 20 : 10
           }}
           transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
-          // cuadricula tipo hoja milimetrada
           style={{
               backgroundColor: "#f5f2eb",
               backgroundImage: `
-                /* 1. Cuadricula mas fina (cada 4px) */
                 linear-gradient(to right, rgba(0, 150, 255, 0.05) 1px, transparent 1px),
                 linear-gradient(to bottom, rgba(0, 150, 255, 0.05) 1px, transparent 1px),
-                
-                /* 2. Cuadricula media (cada 20px - bloque de 5x5) */
                 linear-gradient(to right, rgba(0, 150, 255, 0.15) 1px, transparent 1px),
                 linear-gradient(to bottom, rgba(0, 150, 255, 0.15) 1px, transparent 1px),
-
-                /* 3. Cuadricula de enfasis (cada 40px - bloque de 2x2 de los anteriores) */
                 linear-gradient(to right, rgba(0, 150, 255, 0.3) 1.5px, transparent 1.5px),
                 linear-gradient(to bottom, rgba(0, 150, 255, 0.3) 1.5px, transparent 1.5px)
               `,
@@ -95,11 +93,11 @@ export default function PortfolioHybrid() {
                   <span className="text-[9px] md:text-[10px] font-mono text-slate-400 uppercase tracking-widest">ISO 400 / 35mm</span>
                   <div className="h-[1px] w-8 md:w-12 bg-slate-300" />
                 </div>
-                {hovered === "creative" && (
+                {showCreativeContent && (
                   <motion.div 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="absolute bottom-6 md:bottom-28 flex flex-col items-center z-40"
+                    className="absolute bottom-10 md:bottom-28 flex flex-col items-center z-40"
                   >
                     <span className="text-xs md:text-sm font-serif italic text-slate-500 mb-4 tracking-tight">Documenting the Tangible World</span>
                     <button 
@@ -110,7 +108,7 @@ export default function PortfolioHybrid() {
                     </button>
                   </motion.div>
                 )}
-                <h2 className="absolute top-6 md:top-[20%] text-[9px] md:text-xs font-mono tracking-[0.5em] text-slate-400 uppercase">Analog Photographer</h2>
+                <h2 className={`absolute transition-all duration-500 text-[9px] md:text-xs font-mono tracking-[0.5em] text-slate-400 uppercase ${isMobile && isStatic ? 'top-4' : 'top-6 md:top-[20%]'}`}>Analog Photographer</h2>
               </motion.div>
             )}
           </AnimatePresence>
@@ -118,14 +116,14 @@ export default function PortfolioHybrid() {
 
         {/* --- LADO TECH --- */}
         <motion.div
-          onMouseEnter={() => !isExiting && setHovered("tech")}
-          onMouseLeave={() => !isExiting && setHovered(null)}
+          onMouseEnter={() => !isExiting && !isStatic && setHovered("tech")}
+          onMouseLeave={() => !isExiting && !isStatic && setHovered(null)}
           animate={{ 
             width: !isMobile 
-              ? (isExiting && hovered === "tech" ? "100%" : isExiting && hovered === "creative" ? "0%" : (hovered === "tech" ? "65%" : hovered === "creative" ? "35%" : "50%"))
+              ? (isExiting && hovered === "tech" ? "100%" : isExiting && hovered === "creative" ? "0%" : (isStatic ? "50%" : (hovered === "tech" ? "65%" : hovered === "creative" ? "35%" : "50%")))
               : "100%",
             height: isMobile 
-              ? (isExiting && hovered === "tech" ? "100%" : isExiting && hovered === "creative" ? "0%" : (hovered === "tech" ? "75%" : hovered === "creative" ? "25%" : "50%"))
+              ? (isExiting && hovered === "tech" ? "100%" : isExiting && hovered === "creative" ? "0%" : (isStatic ? "50%" : (hovered === "tech" ? "75%" : hovered === "creative" ? "25%" : "50%")))
               : "100%",
           }}
           transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
@@ -138,11 +136,11 @@ export default function PortfolioHybrid() {
                   <div className="h-[1px] w-8 md:w-12 bg-emerald-900" />
                   <span className="text-[9px] md:text-[10px] font-mono text-emerald-800 uppercase tracking-widest italic">Ubuntu_Server_Running...</span>
                 </div>
-                {hovered === "tech" && (
+                {showTechContent && (
                   <motion.div 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="absolute bottom-16 md:bottom-28 flex flex-col items-center z-40"
+                    className="absolute top-1/2 -translate-y-1/2 md:top-auto md:translate-y-0 md:bottom-28 flex flex-col items-center z-40"
                   >
                     <span className="text-xs md:text-sm font-mono text-emerald-700 mb-4 tracking-tighter">{"{ DevOps & Python }"}</span>
                     <button 
@@ -153,26 +151,36 @@ export default function PortfolioHybrid() {
                     </button>
                   </motion.div>
                 )}
-                <h2 className="absolute top-6 md:top-[20%] text-[9px] md:text-xs font-mono tracking-[0.5em] text-emerald-900 uppercase text-center w-full">Software Developer</h2>
+                <h2 className={`absolute transition-all duration-500 text-[9px] md:text-xs font-mono tracking-[0.5em] text-emerald-900 uppercase text-center w-full ${isMobile && isStatic ? 'bottom-4' : 'top-6 md:top-[20%]'}`}>Software Developer</h2>
               </motion.div>
             )}
           </AnimatePresence>
         </motion.div>
       </div>
 
-      {/* Marca de agua */}
+      {/* Marca de agua (mobile y desktop)*/}
       <AnimatePresence>
         {!isExiting && (
-          <motion.div 
+          <motion.button 
+            onClick={() => setIsStatic(!isStatic)}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
             exit={{ opacity: 0, y: 20 }}
-            className="absolute bottom-6 left-1/2 -translate-x-1/2 z-40 pointer-events-none hidden md:block"
+            className="absolute bottom-6 right-6 md:right-auto md:left-1/2 md:-translate-x-1/2 z-50 pointer-events-auto group"
           >
-            <div className={`w-10 h-10 rounded-full border flex items-center justify-center text-[10px] font-bold transition-colors duration-500 backdrop-blur-md ${
-              hovered === 'tech' ? 'border-emerald-500/50 text-emerald-500 bg-emerald-500/5' : 'border-slate-400/30 text-slate-400 bg-white/5'
+            <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full border flex items-center justify-center text-[10px] font-bold transition-all duration-500 backdrop-blur-md ${
+              isStatic 
+                ? 'bg-white text-black border-white shadow-[0_0_20px_rgba(255,255,255,0.4)]' 
+                : (hovered === 'tech' ? 'border-emerald-500/50 text-emerald-500 bg-emerald-500/5' : 'border-slate-400/30 text-slate-400 bg-white/5')
             }`}>
-                JM
+                {isStatic ? (isMobile ? 'FIX' : 'FIXED') : 'JM'}
             </div>
-          </motion.div>
+            
+            {/* Tooltip de la marca de agua visible solo desktop */}
+            <span className="absolute -top-8 left-1/2 -translate-x-1/2 text-[8px] font-mono text-slate-500 opacity-0 md:group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase tracking-widest">
+              {isStatic ? "Unlock View" : "Static Mode"}
+            </span>
+          </motion.button>
         )}
       </AnimatePresence>
     </div>
