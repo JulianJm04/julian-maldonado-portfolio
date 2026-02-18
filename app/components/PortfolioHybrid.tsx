@@ -58,7 +58,7 @@ export default function PortfolioHybrid() {
           onMouseEnter={() => !isExiting && setHovered("creative")}
           onMouseLeave={() => !isExiting && setHovered(null)}
           animate={{ 
-            // Lógica de expansión al 100% al salir
+            // Logica de expansión al 100% al salir
             width: !isMobile 
               ? (isExiting && hovered === "creative" ? "100%" : isExiting && hovered === "tech" ? "0%" : (hovered === "creative" ? "65%" : hovered === "tech" ? "35%" : "50%"))
               : "100%",
@@ -68,18 +68,26 @@ export default function PortfolioHybrid() {
             zIndex: hovered === "creative" ? 20 : 10
           }}
           transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
+          // cuadricula tipo hoja milimetrada
           style={{
-            backgroundColor: "#f5f2eb",
-            backgroundImage: `
-              linear-gradient(to right, rgba(0, 150, 255, 0.05) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba(0, 150, 255, 0.05) 1px, transparent 1px),
-              linear-gradient(to right, rgba(0, 150, 255, 0.2) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba(0, 150, 255, 0.2) 1px, transparent 1px)
-            `,
-            backgroundSize: "4px 4px, 4px 4px, 20px 20px, 20px 20px"
-          }}
-          className="relative flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-slate-300 cursor-crosshair overflow-hidden touch-none"
-        >
+              backgroundColor: "#f5f2eb",
+              backgroundImage: `
+                /* 1. Cuadricula mas fina (cada 4px) */
+                linear-gradient(to right, rgba(0, 150, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 150, 255, 0.05) 1px, transparent 1px),
+                
+                /* 2. Cuadricula media (cada 20px - bloque de 5x5) */
+                linear-gradient(to right, rgba(0, 150, 255, 0.15) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 150, 255, 0.15) 1px, transparent 1px),
+
+                /* 3. Cuadricula de enfasis (cada 40px - bloque de 2x2 de los anteriores) */
+                linear-gradient(to right, rgba(0, 150, 255, 0.3) 1.5px, transparent 1.5px),
+                linear-gradient(to bottom, rgba(0, 150, 255, 0.3) 1.5px, transparent 1.5px)
+              `,
+              backgroundSize: "4px 4px, 4px 4px, 20px 20px, 20px 20px, 40px 40px, 40px 40px"
+            }}
+            className="relative flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-slate-300 cursor-crosshair overflow-hidden touch-none"
+          >
           <AnimatePresence>
             {!isExiting && (
               <motion.div exit={{ opacity: 0 }} className="w-full h-full flex items-center justify-center">
